@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2a7e599195929a848a4f9393648872b3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - Tower: {fileID: 6824940000096044497, guid: 918badc5089d24941a562e417f1cc8bf, type: 3}
+  - coll: {instanceID: 0}
+  - yourButton: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
