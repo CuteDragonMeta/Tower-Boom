@@ -9,7 +9,7 @@ public class Destruction : MonoBehaviour
 {
     public GameObject Tower;
     public Collider coll;
-    public Button yourButton;
+    // public Button yourButton;
     private InputAction touchAction;
 
     void Awake(){
@@ -19,9 +19,9 @@ public class Destruction : MonoBehaviour
 
     }
     void Start(){
-        coll = GetComponent<Collider>();
-        Button btn = yourButton.GetComponent<Button>();
-		btn.onClick.AddListener(TaskOnClick);
+        // coll = GetComponent<Collider>();
+        // Button btn = yourButton.GetComponent<Button>();
+		// btn.onClick.AddListener(TaskOnClick);
     }
 
  private bool TryGetTouchPosition(out Vector2 touchPos)
@@ -41,9 +41,11 @@ public class Destruction : MonoBehaviour
 
 
     public void TaskOnClick(){
+        Debug.Log("Button Pressed");
        // if(TryGetTouchPosition(out Vector2 touchPos)){}
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0,5f));    
         RaycastHit hit;
+        
 
         if( Physics.Raycast(ray, out hit, 1000.0f)){
             Destroy(hit.collider.gameObject);
