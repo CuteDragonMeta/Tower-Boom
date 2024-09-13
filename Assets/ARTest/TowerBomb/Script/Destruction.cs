@@ -4,13 +4,18 @@ using Unity.VisualScripting;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using System;
 
 public class Destruction : MonoBehaviour
 {
-    public GameObject Tower;
+    public GameObject TowerSplit;
     public Collider coll;
     // public Button yourButton;
     private InputAction touchAction;
+        [SerializeField]
+    private float maxDistance;
+    private int layerMask;
 
     void Awake(){
       touchAction = new InputAction(binding: "<Touchscreen>/primaryTouch/position");
@@ -38,19 +43,38 @@ public class Destruction : MonoBehaviour
         touchPos = default;
         return false;
     }
+    public Component[] Debri;
 
-
+    public float Force;
+    public float UpForce;
     public void TaskOnClick(){
-        Debug.Log("Button Pressed");
        // if(TryGetTouchPosition(out Vector2 touchPos)){}
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0,5f));    
         RaycastHit hit;
         
+        
+        if( Physics.Raycast(ray, out hit, maxDistance)){
+            GameObject TowerWhole = hit.collider.gameObject;
+            Destroy(TowerWhole);
 
-        if( Physics.Raycast(ray, out hit, 1000.0f)){
-            Destroy(hit.collider.gameObject);
-            Instantiate(Tower, hit.transform.position, hit.transform.rotation);
+            Instantiate(TowerSplit, hit.transform.position, hit.transform.rotation);
+            Debri = TowerSplit.GetComponentsInChildren<Rigidbody>(); 
+            foreach (Rigidbody rb in Debri){
+                if(rb != null){
+                    rb.AddExplosionForce(Force, rb.transform.position, 10.0f, UpForce);
+
+                    StartCoroutine(CountDown());
+                }
+
+            }
         }
+    }
+
+    public IEnumerator CountDown(){
+            Debug.Log("Stat");
+            yield return new WaitForSeconds(10);
+            Array.Resize(ref Debri, Debri.Length -1);
+            Debug.Log("End");
     }
 
 }

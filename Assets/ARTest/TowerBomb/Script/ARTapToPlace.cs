@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
+using Unity.VisualScripting;
 
 public class ARTapToPlace : MonoBehaviour
 {
@@ -22,17 +24,16 @@ public class ARTapToPlace : MonoBehaviour
     private InputAction touchAction;
 
     private Vector2 touchPosition;
-    private float timeStamp;
+    bool Wait;
 
     private void Awake()
-    {
-        timeStamp = Time.time + 5f;
-        
+    {        
         mainCamera = Camera.main;
 
         touchAction = new InputAction(binding: "<Touchscreen>/primaryTouch/position");
         touchAction.Enable();
 
+        Wait = true;
         // V�g 1: En v�g att g�!!
         //touchAction.started += TouchAction_started;
     }
@@ -76,7 +77,6 @@ public class ARTapToPlace : MonoBehaviour
     // V�g 2: 
     private void Update()
     {
-        if(timeStamp <= Time.time){
 
             // H�r anropar vi TryGetTouchPosition metoden
             // och f�rhoppningsvis f�r vi tillbaka vart vi har tryckt p� sk�rmen
@@ -88,17 +88,28 @@ public class ARTapToPlace : MonoBehaviour
 
             // Detta omvandlar tv� punkten p� sk�rmen till bokstavligen en
             // raycast str�le som tr�ffar eventuella planes i AR
-            if (raycastManager.Raycast(touchPos, hitResults, TrackableType.Planes))
-            {
-                // Ok vi har verkligen tr�ffat en punkt p� ett plan
-                // h�r s� kan vi g�ra vad vi vill nu med prefabobjektet
-                // och ta vara p� positionen vi tryckte p�
-                Pose hitPose = hitResults[0].pose;
+            if(!raycastManager.Raycast(touchPos,hitResults,TrackableType.Image)){
 
-                Instantiate(refToPrefab, hitPose.position, hitPose.rotation);
+                if (raycastManager.Raycast(touchPos, hitResults, TrackableType.Planes))
+                {
+                    // Ok vi har verkligen tr�ffat en punkt p� ett plan
+                    // h�r s� kan vi g�ra vad vi vill nu med prefabobjektet
+                    // och ta vara p� positionen vi tryckte p�
+                    Pose hitPose = hitResults[0].pose;
+                    if(Wait==true){
+                        StartCoroutine(StartCooldown(hitPose)); 
 
+                    }
+                }
             }
-        }
+    }
+
+    public IEnumerator StartCooldown(Pose hitPose){
+        Instantiate(refToPrefab, hitPose.position, hitPose.rotation);
+        Wait = false;
+		yield return new WaitForSecondsRealtime(10);
+        Wait = true;
+
     }
 
 
